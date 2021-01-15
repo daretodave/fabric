@@ -1,0 +1,32 @@
+{
+  "name": "query",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "run:local": "ts-node-dev --respawn --compiler typescript --project tsconfig.json src/server/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@graphql-modules/core": "0.7.17",
+    "@octokit/core": "3.2.4",
+    "apollo-server": "2.19.2",
+    "class-transformer": "0.3.2",
+    "class-validator": "0.13.1",
+    "graphql": "15.4.0",
+    "octonode": "0.10.0",
+    "parse-link-header": "1.0.1",
+    "reflect-metadata": "0.1.13",
+    "type-graphql": "1.1.1",
+    "typedi": "0.9.1",
+    "typeorm": "0.2.30"
+  },
+  "devDependencies": {
+    "ts-node": "9.1.1",
+    "ts-node-dev": "1.1.1",
+    "typescript": "4.1.3"
+  }
+}
