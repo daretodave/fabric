@@ -2,6 +2,8 @@ import {Inject, Service} from "typedi";
 import {Octokit} from "@octokit/core";
 import * as parseLinkHeader from 'parse-link-header';
 import {GithubServiceSettings} from "./github.service-settings";
+import {ArgsType, Field, Int} from "type-graphql";
+import {Max, Min} from "class-validator";
 
 @Service()
 export class GithubService {
@@ -22,7 +24,7 @@ export class GithubService {
             ...(parameters || {})
         };
 
-        const {
+        let {
             data,
             headers
         } = await this.client.request(
@@ -30,14 +32,19 @@ export class GithubService {
             options
         );
 
+        if (data.hasOwnProperty("items")
+         && Array.isArray(data.items)) {
+            data = data.items;
+        }
+
         if (!Array.isArray(data)) {
             return data;
         }
 
         const result = [...results, ...data];
-        const {next} = parseLinkHeader(headers.link);
+        const {next} = headers.link ? parseLinkHeader(headers.link) : {next: false};
 
-        if (next && !options.limit || result.length < options.limit) {
+        if (next && (!options.limit || result.length < options.limit)) {
 
             return await this.query(path, {
                     ...options,
@@ -50,13 +57,21 @@ export class GithubService {
 
 }
 
+@ArgsType()
+export class GithubServiceArgs {
+    @Field(type => Number, { defaultValue: 0 })
+    @Min(0)
+    page: number;
 
+    @Field(type => Number, { defaultValue: 0 })
+    @Min(0)
+    since: number;
 
-// Container.set({id: GithubService.API_TOKEN, factory: () => process.env.GHE_API_TOKEN});
-// Container.set({id: GithubService.API_HOST, factory: () => process.env.GHE_API_URL});
-// Container.set({
-//     id: GithubService.API_LIMITS, factory: () => ({
-//         RESULTS_PER_PAGE: 50,
-//         RESULTS_LIMIT: 150,
-//     })
-// });
+    @Field(type => Number, { defaultValue: 50 })
+    @Min(1)
+    per_page: number;
+
+    @Field(type => Number)
+    @Min(1)
+    limit = 25;
+}

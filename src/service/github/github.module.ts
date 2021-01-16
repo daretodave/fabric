@@ -7,24 +7,28 @@ import {GraphQLModule} from "@graphql-modules/core";
 import {buildSchemaSync} from "type-graphql";
 import {resolve} from "path";
 import {GithubServiceSettings} from "./github.service-settings";
+import {SearchResolver} from "./search.resolver";
+import {SearchService} from "./search.service";
 
 const resolvers = [
     RepositoryResolver,
-    OrganizationResolver
+    OrganizationResolver,
+    SearchResolver
 ] as const
 
 const services = [
+    GithubServiceSettings,
+    SearchService,
     GithubService,
     RepositoryService,
     OrganizationService
 ]
 
 export const GithubModule = new GraphQLModule({
-    providers: [GithubServiceSettings, ...services, ...resolvers],
+    providers: [...services, ...resolvers],
     extraSchemas: [
         buildSchemaSync({
             resolvers,
-            // orphanedTypes: [User],
             container: ({ context }) => GithubModule.injector.getSessionInjector(context),
             emitSchemaFile: resolve(__dirname, "github.schema.gql"),
         }),
